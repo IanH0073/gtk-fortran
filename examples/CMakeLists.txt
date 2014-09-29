@@ -28,7 +28,8 @@
 
 include_directories("/usr/include")
 include_directories("/usr/local/include")
-include_directories("${CMAKE_BINARY_DIR}/src")
+get_target_property(GTK_FORTRAN_MODULE_DIR gtk-fortran_static Fortran_MODULE_DIRECTORY)
+include_directories("${GTK_FORTRAN_MODULE_DIR}")
 include_directories(${GTK_INCLUDES})
 
 if (NOT NO_BUILD_EXAMPLES) 
