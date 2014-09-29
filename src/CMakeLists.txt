@@ -71,6 +71,16 @@ add_library(gtk-fortran_static STATIC ${sources})
 add_library(gtk-fortran_shared SHARED ${sources})
 target_link_libraries(gtk-fortran_shared ${GTK_LIBRARIES})
 
+# Direct .mod files to separate directories to avoid issues with 
+# parallel builds.
+set_target_properties(gtk-fortran_static PROPERTIES Fortran_MODULE_DIRECTORY static)
+set_target_properties(gtk-fortran_shared PROPERTIES Fortran_MODULE_DIRECTORY shared)
+
+# Specification of different destination directories for mod files requires 
+# specification of different include directories.
+target_include_directories(gtk-fortran_static BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/static)
+target_include_directories(gtk-fortran_shared BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/shared)
+
 set_target_properties(gtk-fortran_static gtk-fortran_shared PROPERTIES
 OUTPUT_NAME gtk-3-fortran)
 set_target_properties(gtk-fortran_static
