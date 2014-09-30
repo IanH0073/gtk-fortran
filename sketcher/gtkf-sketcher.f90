@@ -117,7 +117,7 @@ contains
     else
       ret=.false.
     endif
-    write(*,*),gbool,fbool,ret
+    write(*,*) gbool,fbool,ret
   end function gbool_equal_fbool
   
   function gbool(fbool) result(ret)
@@ -250,7 +250,7 @@ contains
     !GCC$ ATTRIBUTES DLLEXPORT :: delete_event
     integer(c_int)    :: ret
     type(c_ptr), value :: widget, event, gdata
-	call destroy (widget, gdata)
+    call destroy (widget, gdata)
     ret = FALSE
   end function delete_event
 
@@ -701,7 +701,8 @@ contains
       write(50,'(A)')"  builder = gtk_builder_new ()"
       write(50,'(A)')""
       write(50,'(A)')"  ! parse the Glade3 XML file 'gtkbuilder.glade' and add it's contents to the GtkBuilder object"
-      write(50,'(A)')"  guint = gtk_builder_add_from_file (builder, """//subdir(1:len_trim(subdir))//".glade""//c_null_char, error)"
+      write(50,'(A)')"  guint = gtk_builder_add_from_file (builder, """ &
+          //subdir(1:len_trim(subdir)) // ".glade""//c_null_char, error)"
       write(50,'(A)')""
       call combobox_get_active_string_value(appwindow_selector, 0_c_int, appwindow)
       if (widget_symbols) then
