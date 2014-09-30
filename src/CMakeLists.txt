@@ -72,7 +72,9 @@ add_library(gtk-fortran_shared SHARED ${sources})
 target_link_libraries(gtk-fortran_shared ${GTK_LIBRARIES})
 
 # Direct .mod files to separate directories to avoid issues with 
-# parallel builds.
+# parallel builds.  We make this an absolute path so that other 
+# targets can query the property and get an absolute path to the 
+# relevant mod files for the particular library target.
 set_target_properties(gtk-fortran_static PROPERTIES 
 Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/static)
 set_target_properties(gtk-fortran_shared PROPERTIES 
@@ -175,36 +177,36 @@ endif()
 # we need to consider installing both sets (in the same way that 
 # we install two different libraries).  This is best left for a 
 # rainy day.
+set(LIBRARY_TARGET_TO_USE_FOR_MODULES "gtk-fortran_shared")
 set(MODULE_SET "shared")
-
 install(FILES
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/atk.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/cairo.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gdk.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gdk_pixbuf.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/g.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_container.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_button.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_entry.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_tree.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_menu.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_combobox.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_spin_slider.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_chooser.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_dialog.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_progress.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_accelerator.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_infobar.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_assistant.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_misc.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_draw_hl.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gdk_pixbuf_hl.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_sup.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/pango.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gdk_events.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_os_dependent.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/atk.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/cairo.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gdk.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gdk_pixbuf.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/g.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_container.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_button.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_entry.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_tree.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_menu.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_combobox.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_spin_slider.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_chooser.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_dialog.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_progress.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_accelerator.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_infobar.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_assistant.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_hl_misc.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_draw_hl.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gdk_pixbuf_hl.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_sup.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/pango.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gdk_events.mod"
+	"$<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE_FOR_MODULES},Fortran_MODULE_DIRECTORY>/gtk_os_dependent.mod"
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/gtk-3-fortran)
 install(PROGRAMS
   "${CMAKE_CURRENT_BINARY_DIR}/gtk-3-fortran-modscan"
