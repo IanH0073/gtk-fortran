@@ -42,28 +42,28 @@ if (NOT NO_BUILD_EXAMPLES)
   # Isolate .mod files specific to this example in their own directory.  This 
   # avoids issues with clashing module names between the examples.  This 
   # pattern is used for all the examples.
-  set_target_properties(bazaar PROPERTIES Fortran_MODULE_DIRECTORY bazaar)
+  set_target_properties(bazaar PROPERTIES Fortran_MODULE_DIRECTORY bazaar.moddir)
   # Add the directory for .mod files set immediately above to the module 
   # search path.
-  target_include_directories(bazaar BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_PROPERTY:NAME>)
+  target_include_directories(bazaar BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_PROPERTY:Fortran_MODULE_DIRECTORY>)
   add_test(bazaar ./bazaar)
 
   add_executable(cairo-tests "cairo-tests.f90")
   target_link_libraries(cairo-tests ${LIBRARY_TARGET_TO_USE} ${GTK_LIBRARIES})
-  set_target_properties(cairo-tests PROPERTIES Fortran_MODULE_DIRECTORY cairo-tests)
-  target_include_directories(cairo-tests BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_PROPERTY:NAME>)
+  set_target_properties(cairo-tests PROPERTIES Fortran_MODULE_DIRECTORY cairo-tests.moddir)
+  target_include_directories(cairo-tests BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_PROPERTY:Fortran_MODULE_DIRECTORY>)
   add_test(cairo-tests ./cairo-tests)
 
   add_executable(cairo-basics "cairo-basics.f90")
   target_link_libraries(cairo-basics ${LIBRARY_TARGET_TO_USE} ${GTK_LIBRARIES})
-  set_target_properties(cairo-basics PROPERTIES Fortran_MODULE_DIRECTORY cairo-basics)
-  target_include_directories(cairo-basics BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_PROPERTY:NAME>)
+  set_target_properties(cairo-basics PROPERTIES Fortran_MODULE_DIRECTORY cairo-basics.moddir)
+  target_include_directories(cairo-basics BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_PROPERTY:Fortran_MODULE_DIRECTORY>)
   add_test(cairo-basics ./cairo-basics)
 
   add_executable(cairo-basics-click "cairo-basics-click.f90")
   target_link_libraries(cairo-basics-click ${LIBRARY_TARGET_TO_USE} ${GTK_LIBRARIES})
-  set_target_properties(cairo-basics-click PROPERTIES Fortran_MODULE_DIRECTORY cairo-basics-click)
-  target_include_directories(cairo-basics-click BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_PROPERTY:NAME>)
+  set_target_properties(cairo-basics-click PROPERTIES Fortran_MODULE_DIRECTORY cairo-basics-click.moddir)
+  target_include_directories(cairo-basics-click BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_PROPERTY:Fortran_MODULE_DIRECTORY>)
   add_test(cairo-basics ./cairo-basics-click)
 
   add_executable(gtkhello2 "gtkhello2.f90")
