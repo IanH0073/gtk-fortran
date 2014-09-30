@@ -73,13 +73,18 @@ target_link_libraries(gtk-fortran_shared ${GTK_LIBRARIES})
 
 # Direct .mod files to separate directories to avoid issues with 
 # parallel builds.
-set_target_properties(gtk-fortran_static PROPERTIES Fortran_MODULE_DIRECTORY static)
-set_target_properties(gtk-fortran_shared PROPERTIES Fortran_MODULE_DIRECTORY shared)
+set_target_properties(gtk-fortran_static PROPERTIES 
+Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/static)
+set_target_properties(gtk-fortran_shared PROPERTIES 
+Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/shared)
 
-# Specification of different destination directories for mod files requires 
-# specification of different include directories.
-target_include_directories(gtk-fortran_static BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/static)
-target_include_directories(gtk-fortran_shared BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/shared)
+# According to cmake docs, specification of a different destination directory 
+# for mod files requires specification of that as an include directory as 
+# well (just in case the fortran compiler is broken?).
+target_include_directories(gtk-fortran_static BEFORE PRIVATE 
+$<TARGET_PROPERTY:Fortran_MODULE_DIRECTORY>)
+target_include_directories(gtk-fortran_shared BEFORE PRIVATE 
+$<TARGET_PROPERTY:Fortran_MODULE_DIRECTORY>)
 
 set_target_properties(gtk-fortran_static gtk-fortran_shared PROPERTIES
 OUTPUT_NAME gtk-3-fortran)
@@ -88,8 +93,6 @@ gtk-fortran_shared PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 set_target_properties(gtk-fortran_static gtk-fortran_shared PROPERTIES
 VERSION "0.1")
-set_target_properties(gtk-fortran_static
-gtk-fortran_shared PROPERTIES VERSION "0.1")
 set_target_properties(gtk-fortran_static gtk-fortran_shared PROPERTIES
 SOVERSION "0.1")
 
@@ -163,34 +166,45 @@ else()
     ${CMAKE_INSTALL_LIBDIR})
 endif()
 
+# Two sets of modules are generated when the shared and static 
+# variants of the library are built.  Practically these modules 
+# are likely identical.  The following variable specifies which 
+# set is the one to actually install.
+#
+# If the two sets of modules are not practically identical, then 
+# we need to consider installing both sets (in the same way that 
+# we install two different libraries).  This is best left for a 
+# rainy day.
+set(MODULE_SET "shared")
+
 install(FILES
-	"${CMAKE_CURRENT_BINARY_DIR}/atk.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/cairo.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gdk.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gdk_pixbuf.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/g.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_container.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_button.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_entry.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_tree.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_menu.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_combobox.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_spin_slider.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_chooser.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_dialog.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_progress.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_accelerator.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_infobar.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_assistant.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_hl_misc.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_draw_hl.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gdk_pixbuf_hl.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_sup.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/pango.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gdk_events.mod"
-	"${CMAKE_CURRENT_BINARY_DIR}/gtk_os_dependent.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/atk.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/cairo.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gdk.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gdk_pixbuf.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/g.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_container.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_button.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_entry.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_tree.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_menu.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_combobox.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_spin_slider.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_chooser.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_dialog.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_progress.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_accelerator.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_infobar.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_assistant.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_hl_misc.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_draw_hl.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gdk_pixbuf_hl.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_sup.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/pango.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gdk_events.mod"
+	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_SET}/gtk_os_dependent.mod"
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/gtk-3-fortran)
 install(PROGRAMS
   "${CMAKE_CURRENT_BINARY_DIR}/gtk-3-fortran-modscan"

@@ -25,13 +25,18 @@
 
 # CMAKE build file for GtkFortran
 
+# Choose the static or shared version of the library here.
+set(LIBRARY_TARGET_TO_USE "gtk-fortran_static")
+
 include_directories("/usr/include")
 include_directories("/usr/local/include")
-include_directories("${CMAKE_BINARY_DIR}/src")
+# Need to reference the directory for the modules of the 
+# gtk-fortran library.
+include_directories($<TARGET_PROPERTY:${LIBRARY_TARGET_TO_USE},Fortran_MODULE_DIRECTORY>)
 include_directories(${GTK_INCLUDES})
 
 add_executable(gtkf-sketcher "gtkf-sketcher.f90")
-target_link_libraries(gtkf-sketcher gtk-fortran_static ${GTK_LIBRARIES})
+target_link_libraries(gtkf-sketcher ${LIBRARY_TARGET_TO_USE} ${GTK_LIBRARIES})
 # No test as the glade stuff is too sensitive to location
 
 if (UNIX)
