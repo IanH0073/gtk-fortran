@@ -39,6 +39,16 @@ add_executable(gtkf-sketcher "gtkf-sketcher.f90")
 target_link_libraries(gtkf-sketcher ${LIBRARY_TARGET_TO_USE} ${GTK_LIBRARIES})
 # No test as the glade stuff is too sensitive to location
 
+set(lic_file_list 
+    data/apache2.0.lic 
+    data/gnu-gpl-v2.lic 
+    data/gnu-lgpl-v2.lic
+    data/bsd.lic 
+    data/gnu-gpl-v3.lic 
+    data/zlib.lic
+    data/freeware.lic 
+    data/gnu-lgpl-v2.1.lic)
+
 if (UNIX)
   add_custom_command(
      OUTPUT gtkf-sketcher.glade
@@ -88,17 +98,13 @@ if (CMAKE_HOST_WIN32)
      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/data
      )
    add_custom_command(
-     OUTPUT data/apache2.0.lic  data/gnu-gpl-v2.lic     data/gnu-lgpl-v2.lic
-     data/bsd.lic        data/gnu-gpl-v3.lic     data/zlib.lic
-     data/freeware.lic   data/gnu-lgpl-v2.1.lic
+     OUTPUT ${lic_file_list}
      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data 
-     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/data/*.lic
+     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${lic_file_list}
      )
 endif()
 
  add_custom_target(sketcher-glade ALL DEPENDS "gtkf-sketcher.glade")
  add_custom_target(example-glade ALL DEPENDS "example.glade")
  add_custom_target(default-options ALL DEPENDS "default.options")
- add_custom_target(licenses ALL DEPENDS data data/apache2.0.lic  data/gnu-gpl-v2.lic     data/gnu-lgpl-v2.lic
-   data/bsd.lic        data/gnu-gpl-v3.lic     data/zlib.lic
-   data/freeware.lic   data/gnu-lgpl-v2.1.lic)
+ add_custom_target(licenses ALL DEPENDS ${lic_file_list})
