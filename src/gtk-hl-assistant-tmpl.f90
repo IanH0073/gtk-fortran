@@ -69,7 +69,7 @@ contains
   function hl_gtk_assistant_new(title, destroy, delete_event, data_destroy, &
        & data_delete_event, close, data_close, cancel, data_cancel, &
        & border, wsize, parent, icon, icon_file, &
-       & icon_name, forward, data_forward) result(asstnt)
+       & icon_name, forward, data_forward) result(asstnt_tmp)
 
     type(c_ptr) :: asstnt
     character(kind=c_char), dimension(*), intent(in), optional :: title
@@ -115,10 +115,16 @@ contains
     ! If the CLOSE and/or CANCEL keys are not given then the DESTROY handler is
     ! used if available, otherwise a default that just destroys the widget.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to asstnt_tmp
+    type(c_ptr) :: asstnt_tmp
 
     integer(kind=c_int) :: icon_ok
 
     asstnt = gtk_assistant_new()
+    asstnt_tmp = asstnt
 
     if (present(title)) call gtk_window_set_title(asstnt, title)
 

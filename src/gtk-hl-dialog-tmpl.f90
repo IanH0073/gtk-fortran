@@ -85,7 +85,7 @@ contains
 
   !+
   function hl_gtk_message_dialog_new(message, button_set, title, type, &
-       & parent) result(dialog)
+       & parent) result(dialog_tmp)
 
     type(c_ptr) :: dialog
     character(len=*), dimension(:), intent(in) :: message
@@ -105,6 +105,11 @@ contains
     ! TYPE: c_int: optional: Message type (a GTK_MESSAGE_ value)
     ! PARENT: c_ptr: optional: An optional parent for the dialogue.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to dialog_tmp
+    type(c_ptr) :: dialog_tmp
 
     type(c_ptr) :: content, junk, hb, vb
     integer :: i
@@ -113,6 +118,7 @@ contains
     ! Create the dialog window and make it modal.
 
     dialog=gtk_dialog_new()
+    dialog_tmp = dialog
     call gtk_window_set_modal(dialog, TRUE)
     if (present(title)) call gtk_window_set_title(dialog, title)
 
@@ -240,7 +246,7 @@ contains
   !+
   function hl_gtk_about_dialog_new(name, license, license_type, &
        & comments, authors, website, website_label, copyright, version, &
-       & documenters, translators, artists, logo, parent) result(about)
+       & documenters, translators, artists, logo, parent) result(about_tmp)
     type(c_ptr) :: about
     character(kind=c_char, len=*), intent(in), optional :: name
     character(kind=c_char, len=*), intent(in), optional :: license
@@ -271,6 +277,11 @@ contains
     ! LOGO: c_ptr: optional: A gdk_pixbuf with the project's logo.
     ! PARENT: c_ptr: optional: The parent widget of the window.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to about_tmp
+    type(c_ptr) :: about_tmp
 
     character(kind=c_char), dimension(:), allocatable :: string
     character(kind=c_char), pointer, dimension(:) :: credit
@@ -278,6 +289,7 @@ contains
     integer :: i
 
     about = gtk_about_dialog_new()
+    about_tmp = about
     if (present(parent)) call gtk_window_set_transient_for(about, parent)
 
     if (present(name)) then

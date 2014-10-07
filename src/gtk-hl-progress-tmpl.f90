@@ -68,7 +68,7 @@ module gtk_hl_progress
 contains
 
   !+
-  function hl_gtk_progress_bar_new(vertical, reversed, step) result(bar)
+  function hl_gtk_progress_bar_new(vertical, reversed, step) result(bar_tmp)
 
     type(c_ptr) :: bar
     integer(kind=c_int), optional :: vertical, reversed
@@ -82,10 +82,16 @@ contains
     ! STEP: double: optional: The fractional step to advance when
     ! 		pulsing the bar
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to bar_tmp
+    type(c_ptr) :: bar_tmp
 
 !!$GTK< 3.0!    integer(kind=c_int) :: orientation
 
     bar = gtk_progress_bar_new()
+    bar_tmp = bar
 
     ! GTK2 version
 !!$GTK< 3.0!    orientation = GTK_PROGRESS_LEFT_TO_RIGHT

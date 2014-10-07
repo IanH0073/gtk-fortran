@@ -91,7 +91,7 @@ contains
   !+
   function hl_gtk_slider_flt_new(vmin, vmax, step, vertical, initial_value, &
        & value_changed, data, digits, sensitive, tooltip, draw, length) &
-       & result(slider)
+       & result(slider_tmp)
 
     type(c_ptr) :: slider
     real(kind=c_double), intent(in) :: vmin, vmax, step
@@ -127,6 +127,11 @@ contains
     ! This routine is usually called via its generic interface
     ! hl_gtk_slider_new
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to slider_tmp
+    type(c_ptr) :: slider_tmp
 
     integer(kind=c_int) :: isvertical, idraw
 
@@ -140,12 +145,14 @@ contains
 !!$GTK< 3.0!       slider = gtk_vscale_new_with_range(vmin, vmax, step)
 !!$GTK>=3.0!       slider = gtk_scale_new_with_range(GTK_ORIENTATION_VERTICAL, &
 !!$GTK>=3.0!            & vmin, vmax, step)
+       slider_tmp = slider
        if (present(length)) &
             & call gtk_widget_set_size_request(slider, -1_c_int, length)
     else
 !!$GTK< 3.0!       slider = gtk_hscale_new_with_range(vmin, vmax, step)
 !!$GTK>=3.0!       slider = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, &
 !!$GTK>=3.0!            & vmin, vmax, step)
+       slider_tmp = slider
        if (present(length)) &
             & call gtk_widget_set_size_request(slider, length, -1_c_int)
     end if
@@ -377,7 +384,7 @@ contains
   function hl_gtk_spin_button_flt_new(vmin, vmax, step, initial_value, &
        & value_changed, data, digits, sensitive, tooltip, wrap, &
        & focus_in_event, focus_out_event, data_focus_in, data_focus_out) &
-       & result(spin_button)
+       & result(spin_button_tmp)
 
     type(c_ptr) :: spin_button
     real(kind=c_double), intent(in) :: vmin, vmax, step
@@ -420,9 +427,15 @@ contains
     ! This routine is usually called via its generic interface
     ! hl_gtk_spin_button_new
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to spin_button_tmp
+    type(c_ptr) :: spin_button_tmp
 
     ! Create the spin_button
     spin_button = gtk_spin_button_new_with_range(vmin, vmax, step)
+    spin_button_tmp = spin_button
 
     ! Formatting
     call gtk_spin_button_set_numeric(spin_button, TRUE)

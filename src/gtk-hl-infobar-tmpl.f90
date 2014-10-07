@@ -65,7 +65,7 @@ contains
   !+
   function hl_gtk_info_bar_new(buttons, ids, response, data_response, close, &
        & data_close, auto_show, type, default, horizontal, buttons_below) &
-       & result(infobar)
+       & result(infobar_tmp)
     type(c_ptr) :: infobar
     character(len=*,kind=c_char), dimension(:), intent(in), optional :: buttons
     integer(kind=c_int), dimension(:), intent(in), optional :: ids
@@ -94,12 +94,18 @@ contains
     ! BUTTONS_BELOW: boolean: optional: Set to TRUE to place the buttons
     ! 		below the message rather than to the right.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to infobar_tmp
+    type(c_ptr) :: infobar_tmp
 
     integer(kind=c_int) :: i, id
     integer(kind=c_int) :: no_auto
     type(c_ptr) :: label, content, junk, action
 
     infobar = gtk_info_bar_new()
+    infobar_tmp = infobar
 
     label = gtk_label_new (c_null_char)
     content = gtk_info_bar_get_content_area (infobar)

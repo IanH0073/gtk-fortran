@@ -42,7 +42,7 @@ program list_demo
   call gtk_main ()
 
 contains
-  function create_and_fill_model() result(store)
+  function create_and_fill_model() result(store_tmp)
     type(c_ptr) :: store
 
     integer(kind=type_kind), dimension(2), target :: ctypes = &
@@ -50,6 +50,11 @@ contains
     type(gtktreeiter), target :: iter
     type(gvalue), target :: valt, vali
     type(c_ptr) :: val
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to store_tmp
+    type(c_ptr) :: store_tmp
 
     ! Initialize the GValues
     val = c_loc(valt)
@@ -60,6 +65,7 @@ contains
     ! Create the list store
 
     store = gtk_list_store_newv(NUM_COLS, c_loc(ctypes))
+    store_tmp = store
 
     ! Append row 1 and add data
 
@@ -86,13 +92,19 @@ contains
 
   end function create_and_fill_model
 
-  function create_view_and_model() result(view)
+  function create_view_and_model() result(view_tmp)
     type(c_ptr) :: view
 
     type(c_ptr) :: col, renderer, model
     integer(kind=c_int) :: ncol
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to view_tmp
+    type(c_ptr) :: view_tmp
 
     view = gtk_tree_view_new ()
+    view_tmp = view
 
     ! --- Column #1 ---
 

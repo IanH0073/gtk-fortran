@@ -104,7 +104,7 @@ contains
   function hl_gtk_window_new(title, destroy, delete_event, data_destroy, &
        & data_delete_event, border, wsize, sensitive, resizable, decorated, &
        & deletable, above, below, parent, accel_group, icon, icon_file,&
-       & icon_name, modal) result(win)
+       & icon_name, modal) result(win_tmp)
 
     type(c_ptr) :: win
     character(kind=c_char), dimension(*), intent(in), optional :: title
@@ -157,8 +157,15 @@ contains
     !-
 
     integer(kind=c_int) :: icon_ok
+    ! Function result renamed as part of a workaround for an ifort 15.0 bug 
+    ! to do with passing function results to value arguments of a bind(c) 
+    ! procedure.  When the bug is fixed rename the function result back to 
+    ! win, delete this declaration of win_tmp and remove the assignment to 
+    ! win_tmp below.
+    type(c_ptr) :: win_tmp
 
     win = gtk_window_new (GTK_WINDOW_TOPLEVEL)
+    win_tmp = win
     if (present(title)) call gtk_window_set_title(win, title)
 
     if (present(border)) call gtk_container_set_border_width(win, border)
@@ -217,7 +224,7 @@ contains
   end function hl_gtk_window_new
 
   !+
-  function hl_gtk_box_new(horizontal, homogeneous, spacing) result(box)
+  function hl_gtk_box_new(horizontal, homogeneous, spacing) result(box_tmp)
 
     type(c_ptr) :: box
     integer(kind=c_int), intent(in), optional :: horizontal, homogeneous
@@ -234,6 +241,11 @@ contains
     !-
 
     integer(kind=c_int) :: grid, space
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to box_tmp
+    type(c_ptr) :: box_tmp
 
     if (present(homogeneous)) then
        grid = homogeneous
@@ -259,7 +271,7 @@ contains
 !!$GTK< 3.0!       box = gtk_vbox_new(grid, space)
 !!$GTK>=3.0!       box = gtk_box_new(GTK_ORIENTATION_VERTICAL, space)
     end if
-
+    box_tmp = box
 !!$GTK>=3.0!    call gtk_box_set_homogeneous(box, grid)
   end function hl_gtk_box_new
 
@@ -314,7 +326,7 @@ contains
 
   !+
   function hl_gtk_table_new(nrows, ncols, homogeneous, row_spacing, &
-       & col_spacing, row_homogeneous, col_homogeneous) result(table)
+       & col_spacing, row_homogeneous, col_homogeneous) result(table_tmp)
 
     type(c_ptr) :: table
     integer(kind=c_int), intent(in), optional :: nrows, ncols
@@ -344,6 +356,11 @@ contains
     ! For 3.x the ROW and COL settings take precedence over the common setting.
     ! The NROWS and NCOLS arguments are ignored for Gtk+ 3.x
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to table_tmp
+    type(c_ptr) :: table_tmp
 
 !!$GTK< 3.0!    integer(kind=c_int) :: grid, nr,nc
 !!$GTK< 3.0!
@@ -375,6 +392,7 @@ contains
 !!$GTK< 3.0!    end if
 !!$GTK< 3.0!
 !!$GTK< 3.0!    table = gtk_table_new(nr, nc, grid)
+!!$GTK< 3.0!    table_tmp = table
 !!$GTK< 3.0!
 !!$GTK< 3.0!    if (present(row_spacing)) &
 !!$GTK< 3.0!         & call gtk_table_set_row_spacings(table, row_spacing)
@@ -395,6 +413,7 @@ contains
 !!$GTK>=3.0!    if (present(col_homogeneous)) gridc = col_homogeneous
 !!$GTK>=3.0!
 !!$GTK>=3.0!    table = gtk_grid_new()
+!!$GTK>=3.0!    table_tmp = table
 !!$GTK>=3.0!    call gtk_grid_set_row_homogeneous(table, gridr)
 !!$GTK>=3.0!    call gtk_grid_set_column_homogeneous(table, gridc)
 !!$GTK>=3.0!
@@ -543,7 +562,7 @@ contains
 
   !+
   function hl_gtk_notebook_new(show_tabs, tab_position, popup, &
-       & scrollable, group, switch_page, data) result(nbook)
+       & scrollable, group, switch_page, data) result(nbook_tmp)
 
     type(c_ptr) :: nbook
     integer(kind=c_int), intent(in), optional :: show_tabs
@@ -570,8 +589,14 @@ contains
     ! 		index of that page and the user data.
     ! DATA: c_ptr: optional: Data to pass the the switch-page callback.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to nbook_tmp
+    type(c_ptr) :: nbook_tmp
 
     nbook = gtk_notebook_new()
+    nbook_tmp = nbook
 
     if (present(show_tabs)) &
          & call gtk_notebook_set_show_tabs(nbook, show_tabs)
@@ -669,7 +694,7 @@ contains
 
   !+
   function hl_gtk_scrolled_window_new(hpolicy, vpolicy, &
-       & hsize, vsize, hadjustment, vadjustment) result(win)
+       & hsize, vsize, hadjustment, vadjustment) result(win_tmp)
 
     type(c_ptr) :: win
     integer(kind=c_int), intent(in), optional :: hpolicy, vpolicy
@@ -693,6 +718,11 @@ contains
     ! 		of the automatically generated scrollbar in the vertical
     ! 		direction.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to win_tmp
+    type(c_ptr) :: win_tmp
 
     integer(kind=c_int) :: hpol, vpol, hsz, vsz
     type(c_ptr) :: hadj, vadj
@@ -741,6 +771,7 @@ contains
     end if
 
     win = gtk_scrolled_window_new(hadj, vadj)
+    win_tmp = win
 
     if (have_policy) call gtk_scrolled_window_set_policy(win, hpol, vpol)
     if (have_size) call gtk_widget_set_size_request(win, hsz, vsz)

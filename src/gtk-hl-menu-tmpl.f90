@@ -71,7 +71,7 @@ module gtk_hl_menu
 contains
 
   !+
-  function hl_gtk_menu_new(orientation, bar) result(menu)
+  function hl_gtk_menu_new(orientation, bar) result(menu_tmp)
 
     type(c_ptr) :: menu
     integer(kind=c_int), intent(in), optional :: orientation, bar
@@ -86,6 +86,11 @@ contains
 
     integer(kind=c_int) :: orient
     logical :: isbar
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to menu_tmp
+    type(c_ptr) :: menu_tmp
 
     if (present(orientation)) then
        orient= orientation
@@ -100,15 +105,17 @@ contains
 
     if (isbar) then
        menu = gtk_menu_bar_new()
+       menu_tmp = menu
        call gtk_menu_bar_set_pack_direction (menu, orient)
     else
        menu = gtk_menu_new()
+       menu_tmp = menu
     end if
   end function hl_gtk_menu_new
 
   !+
   function hl_gtk_menu_submenu_new(menu, label, tooltip, pos, is_markup, &
-       & sensitive) result(submenu)
+       & sensitive) result(submenu_tmp)
 
     type(c_ptr) :: submenu
     type(c_ptr) :: menu
@@ -132,6 +139,11 @@ contains
 
     type(c_ptr) :: item, label_w
     logical :: markup
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to submenu_tmp
+    type(c_ptr) ::submenu_tmp
 
     if (present(is_markup)) then
        markup=c_f_logical(is_markup)
@@ -151,6 +163,7 @@ contains
 
     ! Create a submenu and attach it to the item
     submenu = gtk_menu_new()
+    submenu_tmp = submenu
     call  gtk_menu_item_set_submenu(item, submenu)
 
     ! Insert it to the parent
@@ -168,7 +181,7 @@ contains
   !+
   function hl_gtk_menu_item_new(menu, label, activate, data, tooltip, &
        & pos, tearoff, sensitive, accel_key, accel_mods, accel_group, &
-       & accel_flags, is_markup) result(item)
+       & accel_flags, is_markup) result(item_tmp)
 
     type(c_ptr) ::  item
     type(c_ptr) :: menu
@@ -214,6 +227,11 @@ contains
     integer(kind=c_int) :: istear
     logical :: markup
     type(c_ptr) :: label_w
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to item_tmp
+    type(c_ptr) :: item_tmp
 
     if (present(tearoff)) then
        istear = tearoff
@@ -231,16 +249,20 @@ contains
     if (present(label)) then
        if (markup) then
           item=gtk_menu_item_new()
+          item_tmp = item
           label_w=gtk_label_new(label)
           call gtk_label_set_markup(label_w, label)
           call gtk_container_add(item,label_w)
        else
           item = gtk_menu_item_new_with_label(label)
+          item_tmp = item
        end if
     else if (istear == TRUE) then
        item = gtk_tearoff_menu_item_new()
+       item_tmp = item
     else
        item = gtk_separator_menu_item_new()
+       item_tmp = item
     end if
 
     ! Insert it to the parent
@@ -280,7 +302,7 @@ contains
 
   !+
   function hl_gtk_check_menu_item_new(menu, label, toggled, data, &
-       & tooltip, pos, initial_state, sensitive, is_markup)  result(item)
+       & tooltip, pos, initial_state, sensitive, is_markup)  result(item_tmp)
 
     type(c_ptr) ::  item
     type(c_ptr) :: menu
@@ -311,6 +333,11 @@ contains
 
     type(c_ptr) :: label_w
     logical :: markup
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to item_tmp
+    type(c_ptr) :: item_tmp
 
     if (present(is_markup)) then
        markup = c_f_logical(is_markup)
@@ -321,11 +348,13 @@ contains
     ! Create the menu item
     if (markup) then
        item = gtk_check_menu_item_new()
+       item_tmp = item
        label_w=gtk_label_new(c_null_char)
        call gtk_label_set_markup(label_w, label)
        call gtk_container_add(item, label_w)
     else
        item = gtk_check_menu_item_new_with_label(label)
+       item_tmp = item
     end if
     
     ! Insert it to the parent
@@ -356,7 +385,7 @@ contains
 
   !+
   function hl_gtk_radio_menu_item_new(group, menu, label, toggled, data, &
-       & tooltip, pos, sensitive, is_markup)  result(item)
+       & tooltip, pos, sensitive, is_markup)  result(item_tmp)
 
     type(c_ptr) :: item
     type(c_ptr), intent(inout) ::  group
@@ -388,6 +417,11 @@ contains
 
     type(c_ptr) :: label_w
     logical :: markup
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to item_tmp
+    type(c_ptr) :: item_tmp
 
     if (present(is_markup)) then
        markup = c_f_logical(is_markup)
@@ -398,11 +432,13 @@ contains
     ! Create the menu item
     if (markup) then
        item = gtk_radio_menu_item_new(group)
+       item_tmp = item
        label_w=gtk_label_new(c_null_char)
        call gtk_label_set_markup(label_w, label)
        call gtk_container_add(item, label_w)
     else
        item = gtk_radio_menu_item_new_with_label(group, label)
+       item_tmp = item
     end if
     group = gtk_radio_menu_item_get_group(item)
 

@@ -77,7 +77,7 @@ module gtk_hl_combobox
 contains
   !+
   function hl_gtk_combo_box_new(has_entry, changed, data, initial_choices, &
-       & sensitive, tooltip, active) result(cbox)
+       & sensitive, tooltip, active) result(cbox_tmp)
 
     type(c_ptr) :: cbox
     integer(kind=c_int), intent(in), optional :: has_entry
@@ -100,6 +100,11 @@ contains
     ! 		held over the widget.
     ! ACTIVE: c_int: optional: The initial active selection.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to cbox_tmp
+    type(c_ptr) :: cbox_tmp
 
     integer(kind=c_int) :: ientry
     integer(kind=c_int) :: i
@@ -121,6 +126,7 @@ contains
 !GTK2
 !!$GTK< 2.24!       cbox =  gtk_combo_box_new_text()
     end if
+    cbox_tmp = cbox
 
     if (present(initial_choices)) then
        do i=1,size(initial_choices)

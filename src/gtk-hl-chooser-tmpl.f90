@@ -117,7 +117,7 @@ contains
   function hl_gtk_file_chooser_button_new(directory, title, &
        & width, show_hidden, initial_dir, current, &
        & initial_folder, initial_file, filter, filter_name, file_set, &
-       & data, sensitive, tooltip) result(cbutton)
+       & data, sensitive, tooltip) result(cbutton_tmp)
 
     type(c_ptr) :: cbutton
     integer(kind=c_int), intent(in), optional :: directory
@@ -156,6 +156,11 @@ contains
     ! TOOLTIP: string: optional: A tooltip to display when the pointer is
     ! 		held over the widget.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to cbutton_tmp
+    type(c_ptr) :: cbutton_tmp
 
     integer(kind=c_int) :: mode, lval
     type(c_ptr) :: gfilter
@@ -179,6 +184,7 @@ contains
        cbutton = gtk_file_chooser_button_new("Choose directory"//c_null_char,&
             & mode)
     end if
+    cbutton_tmp = cbutton
 
     call gtk_file_chooser_set_local_only(cbutton, TRUE)
 
@@ -262,7 +268,7 @@ contains
   function hl_gtk_file_chooser_new(chooser_info, cdir, directory, create, &
        & multiple, allow_uri, show_hidden, confirm_overwrite, title, &
        & initial_dir, current, initial_file, filter, filter_name, parent, &
-       & all, wsize, edit_filters) result(dialog)
+       & all, wsize, edit_filters) result(dialog_tmp)
 
     type(c_ptr) :: dialog
     type(hl_gtk_chooser_info), intent(out), target :: chooser_info
@@ -309,6 +315,11 @@ contains
     ! EDIT_FILTERS: boolean: optional: Set to TRUE to proves an entry window
     ! 		to add extra filters.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to dialog_tmp
+    type(c_ptr) :: dialog_tmp
 
     type(c_ptr) :: content, junk, gfilter
     integer(kind=c_int) :: icreate, idir, action, lval
@@ -317,6 +328,7 @@ contains
 
     ! Create a modal dialogue
     dialog = gtk_dialog_new()
+    dialog_tmp = dialog
     call gtk_window_set_modal(dialog, TRUE)
     if (present(title)) call gtk_window_set_title(dialog, title)
     if (present(wsize)) then

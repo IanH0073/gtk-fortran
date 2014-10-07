@@ -189,7 +189,7 @@ contains
        & data_toggled, edited_spin, data_edited_spin, &
        & edited_combo, data_edited_combo, changed_combo, data_changed_combo,&
        & toggled_radio, data_toggled_radio,  &
-       & hscroll_policy, vscroll_policy) result(list)
+       & hscroll_policy, vscroll_policy) result(list_tmp)
 
     type(c_ptr) :: list
     type(c_ptr), intent(out), optional :: scroll
@@ -297,6 +297,11 @@ contains
     ! 		G_TYPE_INT, not editable.
     ! * The spinner type is not (yet) implemented.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to list_tmp
+    type(c_ptr) :: list_tmp
 
     integer(kind=c_int) :: ncols_all, i, hscroll, vscroll
     integer(kind=type_kind), dimension(:), allocatable, target :: types_all
@@ -350,6 +355,7 @@ contains
     ! Create the storage model and the list.
     model = gtk_list_store_newv(ncols_all, c_loc(types_all))
     list = gtk_tree_view_new_with_model(model)
+    list_tmp = list
 
     if (present(scroll)) then
        if (present(hscroll_policy)) then
@@ -1161,7 +1167,7 @@ contains
        & edited_spin, data_edited_spin, &
        & edited_combo, data_edited_combo, changed_combo, data_changed_combo, &
        & toggled_radio, data_toggled_radio,  &
-       & hscroll_policy, vscroll_policy) result(tree)
+       & hscroll_policy, vscroll_policy) result(tree_tmp)
 
     type(c_ptr) :: tree
     type(c_ptr), intent(out), optional :: scroll
@@ -1248,6 +1254,11 @@ contains
     !
     ! For renderer types see HL_GTK_LISTN_NEW.
     !-
+    
+    ! Workaround for ifort 15.0 bug to do with passing function results to 
+    ! a value argument of a bind(c) procedure.  When the bug is fixed rename 
+    ! the function result and delete all references to tree_tmp
+    type(c_ptr) :: tree_tmp
 
     integer(kind=c_int) :: ncols_all, i, hscroll, vscroll
     integer(kind=type_kind), dimension(:), allocatable, target :: types_all
@@ -1302,6 +1313,7 @@ contains
     ! Create the storage model
     model = gtk_tree_store_newv(ncols_all, c_loc(types_all))
     tree = gtk_tree_view_new_with_model(model)
+    tree_tmp = tree
 
     if (present(scroll)) then
        if (present(hscroll_policy)) then
