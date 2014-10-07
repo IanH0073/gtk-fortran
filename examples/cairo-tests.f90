@@ -128,12 +128,23 @@ contains
 end module handlers
 
 
+! Module to "pass" the my_drawing_area variable from the main program through 
+! to the Mandelbrot_set external procedure, to work around an ice with ifort 
+! 15.0.  When the ice is fixed then the relevant variable can be declared and 
+! passed directly and this module removed.
+module ifort_ice_workaround
+  use, intrinsic :: iso_c_binding, only: c_ptr
+  implicit none
+  private
+  type(c_ptr), public :: my_drawing_area
+end module ifort_ice_workaround
+
 program mandelbrot
   use iso_c_binding, only: c_ptr, c_funloc, c_f_pointer
   use handlers
+  use ifort_ice_workaround
   implicit none
   type(c_ptr) :: my_window
-  type(c_ptr) :: my_drawing_area
   integer :: i
   
   finished = .false.
@@ -171,7 +182,7 @@ program mandelbrot
     pixel(i+3)=char(255)  ! Opacity (Alpha channel)
   end do
 
-  call Mandelbrot_set(my_drawing_area, -2d0, +1d0, -1.5d0, +1.5d0, 100_4)
+  call Mandelbrot_set(-2d0, +1d0, -1.5d0, +1.5d0, 100_4)
   
   ! The window stays opened after the computation:
   do
@@ -188,14 +199,14 @@ end program mandelbrot
 ! A tribute to Benoit MANDELBROT (1924-2010)
 ! http://en.wikipedia.org/wiki/Mandelbrot_set
 !*********************************************
-subroutine Mandelbrot_set(my_drawing_area, xmin, xmax, ymin, ymax, itermax)
+subroutine Mandelbrot_set(xmin, xmax, ymin, ymax, itermax)
   ! Whole set: xmin=-2d0, xmax=+1d0, ymin=-1.5d0, ymax=+1.5d0, itermax=1000
   ! Seahorse valley:  around x=-0.743643887037151, y=+0.13182590420533, itermax=5000
   use iso_c_binding
+  use ifort_ice_workaround
   use handlers
   implicit none
 
-  type(c_ptr) :: my_drawing_area
   integer(4) :: i, j, k, p, itermax
   real(8)    :: x, y, xmin, xmax, ymin, ymax ! coordinates in the complex plane
   complex(8) :: c, z   
