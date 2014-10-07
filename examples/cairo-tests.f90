@@ -207,7 +207,7 @@ subroutine Mandelbrot_set(my_drawing_area, xmin, xmax, ymin, ymax, itermax)
   scx = ((xmax-xmin)/(width/2))   ! x scale
   scy = ((ymax-ymin)/(height/2))  ! y scale
   
-  do i=0, width/2
+  do i=0, width/2 - 1
     ! We provoke an expose_event:
     !if (mod(i,10)==0) then
     if (mod(i,1_c_int)==0) then
@@ -215,7 +215,7 @@ subroutine Mandelbrot_set(my_drawing_area, xmin, xmax, ymin, ymax, itermax)
     end if
     
     x = xmin + scx * i
-    do j=0, height/2
+    do j=0, height/2 - 1
       y = ymin + scy * j
       c = x + y*(0d0,1d0)   ! Starting point
       z = (0d0, 0d0)        ! z0
